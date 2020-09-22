@@ -29,11 +29,33 @@ namespace Physics
             other.VertNum = 100;
             Engine.AddNode(other);
 
+            //cup
+            var wallLeft = new RectangleNode();
+            wallLeft.RectangleSize = new Vector2F(10, 400);
+            wallLeft.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
+            wallLeft.Color = new Color(255, 255, 255);
+            Engine.AddNode(wallLeft);
+
+            var wallRight = new RectangleNode();
+            wallRight.RectangleSize = new Vector2F(10, 400);
+            wallRight.Position = new Vector2F(Engine.WindowSize.X / 2 + 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
+            wallRight.Color = new Color(255, 255, 255);
+            Engine.AddNode(wallRight);
+
+            var wallBottom = new RectangleNode();
+            wallBottom.RectangleSize = new Vector2F(300, 10);
+            wallBottom.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 + wallLeft.RectangleSize.Y / 2);
+            wallBottom.Color = new Color(255, 255, 255);
+            Engine.AddNode(wallBottom);
+
+            
+
 
             while (Engine.DoEvents())
             {
                 Engine.Update();
 
+                //円の衝突判定
                 float len = (circle.Position - other.Position).Length;
                 float dist = circle.Radius + other.Radius;
                 if(len <= dist)
