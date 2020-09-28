@@ -29,6 +29,13 @@ namespace Physics
             other.VertNum = 100;
             Engine.AddNode(other);
 
+            var triangle = new TriangleNode();
+            triangle.Point1 = new Vector2F(400, 100);
+            triangle.Point2 = new Vector2F(450, 200);
+            triangle.Point3 = new Vector2F(500, 100);
+            triangle.Color = normalColor;
+            Engine.AddNode(triangle);
+
             //cup
             var wallLeft = new RectangleNode();
             wallLeft.RectangleSize = new Vector2F(10, 400);
@@ -67,6 +74,11 @@ namespace Physics
                     circle.Color = normalColor;
                 }
 
+                //円と三角形の衝突判定
+                if ((triangle.Point1 - circle.Position).Length < circle.Radius
+                    || (triangle.Point2 - circle.Position).Length < circle.Radius
+                    || (triangle.Point3 - circle.Position).Length < circle.Radius) circle.Color = intersect;
+
                 // 移動
                 if(Engine.Keyboard.GetKeyState(Key.Right) == ButtonState.Hold)
                 {
@@ -85,6 +97,7 @@ namespace Physics
                     circle.Position += new Vector2F(0, 5f);
                 }
 
+                //終了
                 if (Engine.Keyboard.GetKeyState(Key.Escape) == ButtonState.Push)
                 {
                     break;
