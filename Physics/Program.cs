@@ -21,10 +21,11 @@ namespace Physics
             Color normalColor = new Color(100, 130, 180);
 
             var circle = new CircleNode();
-            circle.Radius = 50;
+            circle.Radius = 70;
             circle.Position = new Vector2F(100, 100);
             circle.Color = normalColor;
             circle.VertNum = 100;
+            //circle.ZOrder = 1;
             Engine.AddNode(circle);
 
             var other = new CircleNode();
@@ -96,6 +97,7 @@ namespace Physics
                 if (dist1 <= circle.Radius && Dot(AO, AB) * Dot(BO, AB) <= 0) circle.Color = intersect;
                 if (dist2 <= circle.Radius && Dot(BO, BC) * Dot(CO, BC) <= 0) circle.Color = intersect;
                 if (dist3 <= circle.Radius && Dot(CO, CA) * Dot(AO, CA) <= 0) circle.Color = intersect;
+                if (Vector2F.Cross(AO, AB) <= 0 && Vector2F.Cross(BO, BC) <= 0 && Vector2F.Cross(CO, CA) <= 0) circle.Color = intersect;
 
                 // 移動
                 if (Engine.Keyboard.GetKeyState(Key.Right) == ButtonState.Hold)
