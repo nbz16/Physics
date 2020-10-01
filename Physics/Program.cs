@@ -16,10 +16,11 @@ namespace Physics
 
 
             float gravity = 9.8f;
-            float speed = 0f;
+            Vector2F speed = new Vector2F(0f,0f);
             Color intersect = new Color(200, 0, 0);
             Color normalColor = new Color(100, 130, 180);
 
+            //プレイヤー
             var circle = new CircleNode();
             circle.Radius = 70;
             circle.Position = new Vector2F(100, 100);
@@ -28,13 +29,15 @@ namespace Physics
             //circle.ZOrder = 1;
             Engine.AddNode(circle);
 
+            //円の相手
             var other = new CircleNode();
             other.Radius = 50;
-            other.Position = new Vector2F(300, 300);
+            other.Position = new Vector2F(150, 300);
             other.Color = normalColor;
             other.VertNum = 100;
             Engine.AddNode(other);
 
+            //三角形の相手
             var triangle = new TriangleNode();
             triangle.Point1 = new Vector2F(400, 100);
             triangle.Point2 = new Vector2F(450, 200);
@@ -68,12 +71,21 @@ namespace Physics
             {
                 Engine.Update();
 
+                //speed += new Vector2F(0f, gravity/100);
+                circle.Position += new Vector2F(0f,1f);
+                if (circle.Position.Y > 400f) circle.Position = new Vector2F(circle.Position.X, 400f);
+
                 //円の衝突判定
                 float len = (circle.Position - other.Position).Length;
                 float dist = circle.Radius + other.Radius;
                 if(len <= dist)
                 {
                     circle.Color = intersect;
+
+                    //簡単な衝突応答
+                    var dir = (other.Position - circle.Position);
+                    //中心間を結んだベクトルの方向に、めり込んだ分だけ移動
+                    other.Position += dir.Normal * (circle.Radius + other.Radius - dir.Length);
                 }
                 else
                 {
