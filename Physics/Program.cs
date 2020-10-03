@@ -1,5 +1,6 @@
 ﻿using Altseed2;
 using System;
+using System.Collections.Generic;
 
 namespace Physics
 {
@@ -19,6 +20,7 @@ namespace Physics
             Vector2F speed = new Vector2F(0f,0f);
             Color intersect = new Color(200, 0, 0);
             Color normalColor = new Color(100, 130, 180);
+            List<Vector2F> vertices = new List<Vector2F>();
 
             //プレイヤー
             var player = new CircleNode();
@@ -42,8 +44,14 @@ namespace Physics
             triangle.Point1 = new Vector2F(400, 100);
             triangle.Point2 = new Vector2F(450, 200);
             triangle.Point3 = new Vector2F(500, 100);
+            //triangle.Position = new Vector2F((triangle.Point1.X + triangle.Point2.X + triangle.Point3.X) / 3, (triangle.Point1.Y + triangle.Point2.Y + triangle.Point3.Y) / 3);
+            //triangle.Position = new Vector2F((400 + 450 + 500) / 3, (100 + 200 + 100) / 3);
             triangle.Color = normalColor;
             Engine.AddNode(triangle);
+
+            vertices.Add(triangle.Point1);
+            vertices.Add(triangle.Point2);
+            vertices.Add(triangle.Point3);
 
             //cup
             var wallLeft = new RectangleNode();
@@ -64,7 +72,7 @@ namespace Physics
             wallBottom.Color = new Color(255, 255, 255);
             Engine.AddNode(wallBottom);
 
-            
+
 
 
             while (Engine.DoEvents())
@@ -72,13 +80,13 @@ namespace Physics
                 Engine.Update();
 
                 //speed += new Vector2F(0f, gravity/100);
-                player.Position += new Vector2F(0f,1f);
+                //player.Position += new Vector2F(0f, 1f);
                 if (player.Position.Y > 400f) player.Position = new Vector2F(player.Position.X, 400f);
 
                 //円の衝突判定
                 float len = (player.Position - other.Position).Length;
                 float dist = player.Radius + other.Radius;
-                if(len <= dist)
+                if (len <= dist)
                 {
                     player.Color = intersect;
 
@@ -103,13 +111,26 @@ namespace Physics
                 var AB = triangle.Point3 - triangle.Point1;
                 var BC = triangle.Point2 - triangle.Point3;
                 var CA = triangle.Point1 - triangle.Point2;
+                var center = new Vector2F((triangle.Point1.X + triangle.Point2.X + triangle.Point3.X) / 3, (triangle.Point1.Y + triangle.Point2.Y + triangle.Point3.Y) / 3);
+                var dir = center - player.Position;
                 var dist1 = Math.Abs(Vector2F.Cross(AO, AB)) / AB.Length;
                 var dist2 = Math.Abs(Vector2F.Cross(BO, BC)) / BC.Length;
                 var dist3 = Math.Abs(Vector2F.Cross(CO, CA)) / CA.Length;
-                if (dist1 <= player.Radius && Dot(AO, AB) * Dot(BO, AB) <= 0) player.Color = intersect;
-                if (dist2 <= player.Radius && Dot(BO, BC) * Dot(CO, BC) <= 0) player.Color = intersect;
-                if (dist3 <= player.Radius && Dot(CO, CA) * Dot(AO, CA) <= 0) player.Color = intersect;
-                if (Vector2F.Cross(AO, AB) <= 0 && Vector2F.Cross(BO, BC) <= 0 && Vector2F.Cross(CO, CA) <= 0) player.Color = intersect;
+                if ((dist1 <= player.Radius && Dot(AO, AB) * Dot(BO, AB) <= 0)
+                    || (dist2 <= player.Radius && Dot(BO, BC) * Dot(CO, BC) <= 0)
+                    || (dist3 <= player.Radius && Dot(CO, CA) * Dot(AO, CA) <= 0))
+                {
+                    player.Color = intersect;
+                    triangle.Point1 += dir.Normal * (player.Radius - dist1);
+                    triangle.Point2 += dir.Normal * (player.Radius - dist1);
+                    triangle.Point3 += dir.Normal * (player.Radius - dist1);
+                }
+
+                Console.WriteLine(triangle.Position);
+               
+
+
+                //if (Vector2F.Cross(AO, AB) <= 0 && Vector2F.Cross(BO, BC) <= 0 && Vector2F.Cross(CO, CA) <= 0) player.Color = intersect;
 
                 // 移動
                 if (Engine.Keyboard.GetKeyState(Key.Right) == ButtonState.Hold)
