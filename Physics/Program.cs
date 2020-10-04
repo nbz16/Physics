@@ -41,7 +41,7 @@ namespace Physics
 
             var other2 = new CircleNode();
             other2.Radius = 50;
-            other2.Position = new Vector2F(320, 50);
+            other2.Position = new Vector2F(300, 50);
             other2.Color = normalColor;
             other2.VertNum = 100;
             Engine.AddNode(other2);
@@ -56,30 +56,23 @@ namespace Physics
             triangle.Color = normalColor;
             //Engine.AddNode(triangle);
 
-            //cup
-            //var wallLeft = new RectangleNode();
-            //wallLeft.RectangleSize = new Vector2F(10, 400);
-            //wallLeft.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
-            //wallLeft.Color = new Color(255, 255, 255);
-            //Engine.AddNode(wallLeft);
-
-            //var wallRight = new RectangleNode();
-            //wallRight.RectangleSize = new Vector2F(10, 400);
-            //wallRight.Position = new Vector2F(Engine.WindowSize.X / 2 + 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
-            //wallRight.Color = new Color(255, 255, 255);
-            //Engine.AddNode(wallRight);
-
-            //var wallBottom = new RectangleNode();
-            //wallBottom.RectangleSize = new Vector2F(300, 10);
-            //wallBottom.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 + wallLeft.RectangleSize.Y / 2);
-            //wallBottom.Color = new Color(255, 255, 255);
-            //Engine.AddNode(wallBottom);
-
             var line = new RectangleNode();
             line.RectangleSize = new Vector2F(960, 2);
             line.Position = new Vector2F(0, 400);
             line.Color = new Color(255, 30, 30);
             Engine.AddNode(line);
+
+            var lineL = new RectangleNode();
+            lineL.RectangleSize = new Vector2F(2, 720-320);
+            lineL.Position = new Vector2F(200, 0);
+            lineL.Color = new Color(255, 30, 30);
+            Engine.AddNode(lineL);
+
+            var lineR = new RectangleNode();
+            lineR.RectangleSize = new Vector2F(2, 720 - 320);
+            lineR.Position = new Vector2F(500, 0);
+            lineR.Color = new Color(255, 30, 30);
+            Engine.AddNode(lineR);
 
 
             collision.Add(player);
@@ -120,25 +113,9 @@ namespace Physics
                     CircleNode obj = collision[i];
                     obj.Position += new Vector2F(0f, 2f);
                     if (obj.Position.Y + obj.Radius > 400f) obj.Position = new Vector2F(obj.Position.X, 400f - obj.Radius);
+                    if (obj.Position.X - obj.Radius < 200f) obj.Position = new Vector2F(200f + obj.Radius, obj.Position.Y);
+                    if (obj.Position.X + obj.Radius > 500f) obj.Position = new Vector2F(500f - obj.Radius, obj.Position.Y);
                 }
-                
-
-                ////円の衝突判定
-                //float len = (player.Position - other.Position).Length;
-                //float dist = player.Radius + other.Radius;
-                //if (len <= dist)
-                //{
-                //    player.Color = intersect;
-
-                //    //簡単な衝突応答
-                //    var dir = (other.Position - player.Position);
-                //    //中心間を結んだベクトルの方向に、めり込んだ分だけ移動
-                //    other.Position += dir.Normal * (player.Radius + other.Radius - dir.Length);
-                //}
-                //else
-                //{
-                //    player.Color = normalColor;
-                //}
 
                 //円と三角形の衝突判定
                 if ((triangle.Point1 - player.Position).Length < player.Radius
@@ -177,7 +154,6 @@ namespace Physics
                     triangle.Point2 += direction.Normal * (player.Radius - dist3);
                     triangle.Point3 += direction.Normal * (player.Radius - dist3);
                 }
-
                 if (triangle.Point1.Y < 400 || triangle.Point2.Y < 400 || triangle.Point2.Y < 400)
                 {
                     triangle.Point1 += new Vector2F(0f, 1f);
