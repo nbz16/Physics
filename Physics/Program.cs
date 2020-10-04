@@ -20,12 +20,12 @@ namespace Physics
             Vector2F speed = new Vector2F(0f,0f);
             Color intersect = new Color(200, 0, 0);
             Color normalColor = new Color(100, 130, 180);
-            List<Vector2F> vertices = new List<Vector2F>();
+            List<CircleNode> collision = new List<CircleNode>();
 
             //プレイヤー
             var player = new CircleNode();
             player.Radius = 70;
-            player.Position = new Vector2F(100, 100);
+            player.Position = new Vector2F(300, 100);
             player.Color = normalColor;
             player.VertNum = 100;
             //circle.ZOrder = 1;
@@ -34,10 +34,17 @@ namespace Physics
             //円の相手
             var other = new CircleNode();
             other.Radius = 50;
-            other.Position = new Vector2F(150, 300);
+            other.Position = new Vector2F(350, 300);
             other.Color = normalColor;
             other.VertNum = 100;
             Engine.AddNode(other);
+
+            var other2 = new CircleNode();
+            other2.Radius = 50;
+            other2.Position = new Vector2F(320, 50);
+            other2.Color = normalColor;
+            other2.VertNum = 100;
+            Engine.AddNode(other2);
 
             //三角形の相手
             var triangle = new TriangleNode();
@@ -47,33 +54,37 @@ namespace Physics
             //triangle.Position = new Vector2F((triangle.Point1.X + triangle.Point2.X + triangle.Point3.X) / 3, (triangle.Point1.Y + triangle.Point2.Y + triangle.Point3.Y) / 3);
             //triangle.Position = new Vector2F((400 + 450 + 500) / 3, (100 + 200 + 100) / 3);
             triangle.Color = normalColor;
-            Engine.AddNode(triangle);
-
-            vertices.Add(triangle.Point1);
-            vertices.Add(triangle.Point2);
-            vertices.Add(triangle.Point3);
+            //Engine.AddNode(triangle);
 
             //cup
-            var wallLeft = new RectangleNode();
-            wallLeft.RectangleSize = new Vector2F(10, 400);
-            wallLeft.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
-            wallLeft.Color = new Color(255, 255, 255);
-            Engine.AddNode(wallLeft);
+            //var wallLeft = new RectangleNode();
+            //wallLeft.RectangleSize = new Vector2F(10, 400);
+            //wallLeft.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
+            //wallLeft.Color = new Color(255, 255, 255);
+            //Engine.AddNode(wallLeft);
 
-            var wallRight = new RectangleNode();
-            wallRight.RectangleSize = new Vector2F(10, 400);
-            wallRight.Position = new Vector2F(Engine.WindowSize.X / 2 + 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
-            wallRight.Color = new Color(255, 255, 255);
-            Engine.AddNode(wallRight);
+            //var wallRight = new RectangleNode();
+            //wallRight.RectangleSize = new Vector2F(10, 400);
+            //wallRight.Position = new Vector2F(Engine.WindowSize.X / 2 + 150, Engine.WindowSize.Y / 2 - wallLeft.RectangleSize.Y / 2);
+            //wallRight.Color = new Color(255, 255, 255);
+            //Engine.AddNode(wallRight);
 
-            var wallBottom = new RectangleNode();
-            wallBottom.RectangleSize = new Vector2F(300, 10);
-            wallBottom.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 + wallLeft.RectangleSize.Y / 2);
-            wallBottom.Color = new Color(255, 255, 255);
-            Engine.AddNode(wallBottom);
+            //var wallBottom = new RectangleNode();
+            //wallBottom.RectangleSize = new Vector2F(300, 10);
+            //wallBottom.Position = new Vector2F(Engine.WindowSize.X / 2 - 150, Engine.WindowSize.Y / 2 + wallLeft.RectangleSize.Y / 2);
+            //wallBottom.Color = new Color(255, 255, 255);
+            //Engine.AddNode(wallBottom);
+
+            var line = new RectangleNode();
+            line.RectangleSize = new Vector2F(960, 2);
+            line.Position = new Vector2F(0, 400);
+            line.Color = new Color(255, 30, 30);
+            Engine.AddNode(line);
 
 
-
+            collision.Add(player);
+            collision.Add(other);
+            collision.Add(other2);
 
             while (Engine.DoEvents())
             {
@@ -81,24 +92,53 @@ namespace Physics
 
                 //speed += new Vector2F(0f, gravity/100);
                 //player.Position += new Vector2F(0f, 1f);
-                if (player.Position.Y > 400f) player.Position = new Vector2F(player.Position.X, 400f);
-
-                //円の衝突判定
-                float len = (player.Position - other.Position).Length;
-                float dist = player.Radius + other.Radius;
-                if (len <= dist)
+                for(int i = 0; i < collision.Count; i++)
                 {
-                    player.Color = intersect;
+                    for(int j = 0; j < collision.Count; j++)
+                    {
+                        if (collision[i] == collision[j]) continue;
+                        float length = (collision[i].Position - collision[j].Position).Length;
+                        float distance = collision[i].Radius + collision[j].Radius;
+                        if(length <= distance)
+                        {
+                            //collision[i].Color = intersect;
+                            //collision[j].Color = intersect;
 
-                    //簡単な衝突応答
-                    var dir = (other.Position - player.Position);
-                    //中心間を結んだベクトルの方向に、めり込んだ分だけ移動
-                    other.Position += dir.Normal * (player.Radius + other.Radius - dir.Length);
+                            //簡単な衝突応答
+                            var dir = (collision[j].Position - collision[i].Position);
+                            //中心間を結んだベクトルの方向に、めり込んだ分だけ移動
+                            collision[i].Position -= dir.Normal * (distance - dir.Length);
+                            collision[j].Position += dir.Normal * (distance - dir.Length);
+                        }
+                        else
+                        {
+                            collision[i].Color = normalColor;
+                            collision[j].Color = normalColor;
+                        }
+                    }
+
+                    CircleNode obj = collision[i];
+                    obj.Position += new Vector2F(0f, 2f);
+                    if (obj.Position.Y + obj.Radius > 400f) obj.Position = new Vector2F(obj.Position.X, 400f - obj.Radius);
                 }
-                else
-                {
-                    player.Color = normalColor;
-                }
+                
+
+                ////円の衝突判定
+                //float len = (player.Position - other.Position).Length;
+                //float dist = player.Radius + other.Radius;
+                //if (len <= dist)
+                //{
+                //    player.Color = intersect;
+
+                //    //簡単な衝突応答
+                //    var dir = (other.Position - player.Position);
+                //    //中心間を結んだベクトルの方向に、めり込んだ分だけ移動
+                //    other.Position += dir.Normal * (player.Radius + other.Radius - dir.Length);
+                //}
+                //else
+                //{
+                //    player.Color = normalColor;
+                //}
 
                 //円と三角形の衝突判定
                 if ((triangle.Point1 - player.Position).Length < player.Radius
@@ -137,9 +177,13 @@ namespace Physics
                     triangle.Point2 += direction.Normal * (player.Radius - dist3);
                     triangle.Point3 += direction.Normal * (player.Radius - dist3);
                 }
-                Console.WriteLine(triangle.Position);
-               
 
+                if (triangle.Point1.Y < 400 || triangle.Point2.Y < 400 || triangle.Point2.Y < 400)
+                {
+                    triangle.Point1 += new Vector2F(0f, 1f);
+                    triangle.Point2 += new Vector2F(0f, 1f);
+                    triangle.Point3 += new Vector2F(0f, 1f);
+                }
 
                 //if (Vector2F.Cross(AO, AB) <= 0 && Vector2F.Cross(BO, BC) <= 0 && Vector2F.Cross(CO, CA) <= 0) player.Color = intersect;
 
