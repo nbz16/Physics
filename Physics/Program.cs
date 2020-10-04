@@ -112,20 +112,31 @@ namespace Physics
                 var BC = triangle.Point2 - triangle.Point3;
                 var CA = triangle.Point1 - triangle.Point2;
                 var center = new Vector2F((triangle.Point1.X + triangle.Point2.X + triangle.Point3.X) / 3, (triangle.Point1.Y + triangle.Point2.Y + triangle.Point3.Y) / 3);
-                var dir = center - player.Position;
+                var direction = center - player.Position;
                 var dist1 = Math.Abs(Vector2F.Cross(AO, AB)) / AB.Length;
                 var dist2 = Math.Abs(Vector2F.Cross(BO, BC)) / BC.Length;
                 var dist3 = Math.Abs(Vector2F.Cross(CO, CA)) / CA.Length;
-                if ((dist1 <= player.Radius && Dot(AO, AB) * Dot(BO, AB) <= 0)
-                    || (dist2 <= player.Radius && Dot(BO, BC) * Dot(CO, BC) <= 0)
-                    || (dist3 <= player.Radius && Dot(CO, CA) * Dot(AO, CA) <= 0))
+                if (dist1 <= player.Radius && Dot(AO, AB) * Dot(BO, AB) <= 0)
                 {
                     player.Color = intersect;
-                    triangle.Point1 += dir.Normal * (player.Radius - dist1);
-                    triangle.Point2 += dir.Normal * (player.Radius - dist1);
-                    triangle.Point3 += dir.Normal * (player.Radius - dist1);
+                    triangle.Point1 += direction.Normal * (player.Radius - dist1);
+                    triangle.Point2 += direction.Normal * (player.Radius - dist1);
+                    triangle.Point3 += direction.Normal * (player.Radius - dist1);
                 }
-
+                if(dist2 <= player.Radius && Dot(BO, BC) * Dot(CO, BC) <= 0)
+                {
+                    player.Color = intersect;
+                    triangle.Point1 += direction.Normal * (player.Radius - dist2);
+                    triangle.Point2 += direction.Normal * (player.Radius - dist2);
+                    triangle.Point3 += direction.Normal * (player.Radius - dist2);
+                }
+                if (dist3 <= player.Radius && Dot(CO, CA) * Dot(AO, CA) <= 0)
+                {
+                    player.Color = intersect;
+                    triangle.Point1 += direction.Normal * (player.Radius - dist3);
+                    triangle.Point2 += direction.Normal * (player.Radius - dist3);
+                    triangle.Point3 += direction.Normal * (player.Radius - dist3);
+                }
                 Console.WriteLine(triangle.Position);
                
 
